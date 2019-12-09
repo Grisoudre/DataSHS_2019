@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Prise en main et premiers traitements d’une base de données sous R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="PUDL" />
+    <link href="libs/remark-css-0.0.1/grisoudre.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Prise en main et premiers traitements d’une base de données sous R
+## Produire et analyser ses données en SHS
+### PUDL
+### Dernière modification : 2019-12-09
+
+---
+
+
+
+## Programme de la journée
+
++ Prise en main de R
++ Importation de données
++ Mise en forme de données avec `Tidyverse`
++ Traitements sur une et deux variables
++ Graphiques avec `ggplot2`
++ Jointures de tables
+
+---
+
+## Données utilisées
+
+
+Nous allons travailler sur des données portant sur les accidents de la route 2018 décrits par les forces de police : 
+https://www.data.gouv.fr/fr/datasets/base-de-donnees-accidents-corporels-de-la-circulation/
+
+**A télécharger :**
+
++ **Caractéristiques** : Circonstances générales de l'accident
++ **lieux** : Caractéristiques de l'endroit où a eu lieu l'accident
++ **Véhicules** : Catégories de véhicules
++ **usagers** : Informations sur les personnes impliquées
+
+**Identifiants :**
+
++ **Num_Acc** : Identifiant de l'accident
++ **Num_veh** : Identifiant véhicule, un accident peut concerner plusieurs véhicules
+
+
+---
+
+## Comment appréhender des tables de données ?
+
+
++ **"Logiciels clic-boutons"** : Excel, Excel Stat... et à un autre niveau SPAD, SPSS, Sphinx, ModaLisa. 
+
+Interface avec menus et options évitant de passer par des lignes de commande. Facilité d'accès mais tâches répétitives et non enregistrées. Pas d'historique des actions effectuées. Problème de la reproductibilité et de la transférabilité des documents produits.
+
++ **Langages de programmation** : essentiellement Python, SAS, R, SPSS...
+
+Chaque action est produite par une ligne de commande exécutée dans un IDE (environnement de développement intégré). Historique et reproductibilité garantis, plus de possibilités.
+
+
+---
+
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;h1 align="right"&gt;&lt;font color="#5C5C5C"&gt;1. Présentation de R et de l'environnement de travail&lt;/font&gt;&lt;/h1&gt;
+
+
+---
+
+
+
+## Environnement de RStudio
+
+
+R est :
+
+- Un dérivé gratuit (licence GNU GPL) du langage de statistique S
+- Un projet collaboratif et donc ouvert à tous, entretenu par le R Development Core Team (CRAN)
+- Un **langage** permettant de produire des statistiques ou des fonctions
+- Augmenté d'une forte communauté partageant des fonctionnalités étendues
+
+
+**En bref :**
+
++ **Gratuit** et **opensource**
++ **Multi-plateformes** (Windows, Linux, OS X)
++ Produit **simplement** des statistiques avancées :
+    + Statistiques descriptives, inférentielles
+    + Représentations graphiques
+    + Analyses factorielles
+    + Modélisations
+    + Analyses de réseaux
+    + Cartographies, 
+    + Scraping, 
+    + etc.
+    
+---
+    
++ Grâce aux **"packages"** (extensions, bibliothèques de fonctions), les fonctionnalités sont très étendues et en font un langage complet
++ Importante **communauté** :
+    + Tutoriels et aides en ligne
+    + Développement constant de nouvelles fonctionnalités, interfaces et mises à jour régulières
++ **Reproductibilité** et **historique** : 
+    + **Partager** simplement des **rapports commentés** (pdf, word, htlm, présentations) et **applications en ligne** ;
+    + **Reproduire** et adapter des procédures et méthodes réalisées pour d'autres projets (ex : Rapports annuels);
++ Permet de ne pas subir des options par défaut sans les comprendre
++ **Compatible** avec d'autres langages (possibilité d'intégrer des lignes de commande en sql ou en python), **exportations graphiques** avancées
+
+*... Quelques inconvénients :*
+
++ Les fonctionnalités (et bibliothèques) sont très souvent mises à jour et nécessitent d'être maintenues.
++ Les fonctionnalités sont créées par les contributeurs et les syntaxes peuvent être variées
+
+---
+
+## Téléchargements et environnement
+
+*Vous pouvez utiliser vos ordinateurs portables si vous êtes plus à l'aise. Si vous ne les avez pas, vous pouvez utiliser les ordinateurs de la salle. En tout cas gardez le même ordinateur pour toutes les séances.*
+
+
+**- (1) Télécharger le langage R :**
+
+https://cran.r-project.org/
+
+Puis "download R for..." suivant votre système d'exploitation (base pour Windows, R-3.6.1.pkg pour mac et sudo apt-get install r-base r-base-dev dans le terminal pour linux)
+
+**- (2) Télécharger et installer l'IDE RStudio :**
+
+La console diponible avec R (RGui) est rudimentaire. On utilisera l'IDE **RStudio** (auto-complétion, coloration, indentation, erreurs de syntaxe mises en évidence, gestion des scripts, visualisations, projets, affichage simultané des scripts, sorties, fichiers, graphiques, aides).
+
+
+- **RStudio** : https://www.rstudio.com/products/rstudio/download/#download
+
+---
+## Environnement de RStudio
+
+&lt;img src="img/environnementRStudio2.png" width="650px" /&gt;
+
+---
+
+- **Console** : Retour direct des instructions (**sans sauvegarde**), des informations et erreurs.
+
+**"&gt;" = prêt à recevoir des instructions.**
+
+Instruction simple :
+
+```r
+1+1
+```
+Et touche Entrée
+
+- **Script** : Texte d'édition du programme ou script qui sera **gardé en mémoire** (après sauvegarde)
+
+Pour ouvrir un script : ctrl+shift+N ou Fichier &gt; new file &gt; R script
+
+```r
+1+1
+```
+
+**Exécution :**
+
+- Sélectionner la ligne puis Ctrl + entrée ou bouton "Run". 
+- Ou "Source" pour tout exécuter
+
+---
+
+## Créer un objet dans R
+
+Dans R, on manipule des **objets** qui contiennent des informations sur lesquelles on agit. 
+
+Pour créer un objet, on lui donne un nom, puis on écrit **&lt;-** afin de signaler qu'on va définir un contenu à cet objet, enfin on définit son contenu :
+
+
+
+```r
+# Création d'une valeur
+Objet &lt;- 5 + 7
+Objet + Objet
+Objet &lt;- Objet + 2
+Objet + Objet
+# Création d'une chaîne de caractères
+Texte &lt;- "Mon texte"
+Texte
+# texte
+```
+
+Les objets peuvent être de différentes natures : chaîne de caractère, chiffre, suite d'éléments (vecteur), tableau, matrice, image, graphique, etc. Ils sont toujours accessibles par déclaration et créés/édités avec "&lt;-"
+
+**Attention :**
+
+- Respect de la casse
+- Ni accent, ni espace, ni caractère spécial en-dehors de "_"
+
+
+---
+
+
+```r
+# supprimer un ou des objets :
+rm(Objet, Texte)
+```
+
+---
+
+## Utiliser des fonctions dans R
+
+Les actions sont réalisées à l'aide de **fonctions** qui agissent sur des **objets**. Les fonctions sont déclarées par leurs noms et suivies de parenthèses : **fonction()** dans lesquelles on déclare un ou plusieurs arguments : les **objets** et des **options**.
+
+
+```r
+A &lt;- 14.5646
+print(A, digits = 4)
+round(A)
+round(A, digits = 2)
+trunc(A)
+```
+où **print** est la fonction "imprime", **A** l'objet à imprimer, **digits = 4** l'option "quatre chiffres".
+
+Par défaut, notations anglosaxonnes (. ou décimales)
+---
+
+- **Objets** : Liste des objets créés (tableaux avec variables, listes, etc.)
+
+- **Historique**
+
+- **Fichiers** : Dossiers et fichiers
+
+- **Graphiques** : Zoom, export
+
+- **Aide** : Obtenir plus d'information sur une fonction, par exemple la fonction table() :
+
+```r
+?print
+?round
+?trunc
+```
+
+
+
+- **Menus** :
+    - **Fichiers** : Nouveau fichier (script, présentation), ouvrir fichier, enregistrer, fichiers récents
+    - **Outils** : Installer package (gmodels), options
+    - **Session** : Actions sur la session de travail
+
+---
+## Les packages
+
+- **Packages** : Extensions ajoutées à votre session de travail, une fois installées et chargées. Les packages sont des **bibliothèques de fonctions** supplémentaires développées par d'autres personnes.
+
+- Les packages "officiels" sont validés par la communauté de R (CRAN). Ils sont tous **accompagnés d'une documentation** (document pdf issu du site cran.r-project.org).
+
+
+Pour utiliser un package validé par le CRAN :
+
+  - *1. L'installer* **(une seule fois)**
+  
+
+```r
+install.packages("tidyverse", dep=T)
+```
+
+*Cette étape d'installation des packages est délicate : R évoluant rapidement, la compatibilité entre les packages et entre les packages et la version utilisée de R n'est toujours maintenue.*
+
+Installer également `questionr`
+
+---
+
+  - **2. Le charger** **(à refaire pour chaque session)**.
+      - En ligne de commande :
+
+```r
+library(tidyverse)
+library(questionr)
+```
+
+
+**/!\\ Il est préférable d'écrire ces lignes afin que les packages soient automatiquement définis et que les fonctions associées fonctionnent.**
+
+**On recommande aussi de mettre ces lignes en début de script.**
+
+*library() est équivalent à require()*
+
+
+
+**Enregistrez votre script : File &gt; Save as...**
+
+
+---
+
+## Organiser son travail
+
+Quand on entame un projet, les lignes de commande, scripts, tableaux créés et dossiers peuvent s'accumuler. Il est important d'organiser son travail dès le début.
+
+**Gérer ses projets** : 
+
+Vous créez un dossier par projet. Ce dossier est directement relié à votre projet et comporte des sous-dossiers "données", "scripts", "sorties" par exemple.
+
+Dès maintenant, créez un dossier pour le TD, comprenant des sous-dossiers :
+- data : données importées
+- sorties : tableaux et graphiques créés
+
+Et enregistrez le script en cours dans ce dossier : "dataSHS_19.R"
+
+En haut à droite, un icône permet de créer un **"nouveau projet"**. C'est un assistant de création d'un **dossier** dédié à un projet spécifique dans votre explorateur (windows, mac ou linux). Il sera associé à une **session de Rstudio**, qui sera indépendante des documents et objets utilisés pour un autre projet.
+
+ou bien File &gt; New Project &gt; Existing directory –&gt; Browse &gt; Sélectionner votre dossier créé pour le TD &gt; Create project
+
+Un fichier **Nom_du_dossier.Rproj** apparaît dans le dossier, c'est le raccourci qui mènera à la session R. Un fichier **.RData** sera également créé et contiendra les tableaux présents dans l'environnement.
+
+---
+
+## Commentaires
+
+Lire ou relire un programme, ce n'est pas lire un roman. Ca peut être fastidieux, surtout lorsque le programme n'est pas commenté. 
+
+Les commentaires permettent de comprendre la logique engagée sur une partie de programme, de préciser l'utilisation d'une fonction et d'organiser un script. Les commentaires sont précédés de **#** et ne sont pas exécutés.
+
+Pour passer un ensemble sélectionné en commentaire (et inversement) : **ctrl+shift+c**.
+
+Aérer le texte et mettre des titres facilitent aussi grandement la lecture de scripts : sur une ligne, **# Titre \-\-\-\- **
+
+
+**Enfin, il y a plusieurs façons d'arriver à un résultat recherché ; Il s'agit déjà de comprendre ce qu'on fait. On préferera l'écriture la plus concise et compréhensible**
+
+
+---
+
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;h1 align="right"&gt;&lt;font color="#5C5C5C"&gt;2. Importer des données&lt;/font&gt;&lt;/h1&gt;
+
+
+---
+
+## Création directe de tableaux
+
+Méthode peu utilisée mais à connaître pour comprendre l'écriture dans R.
+
++ **1. Soit on crée les colonnes (vecteurs) qu'on agrège ensuite :**
+
+```r
+vectA &lt;- c(1,2,3,4,5) # Le vecteur vectA est constitué des observations 1, 2, 3, 4 et 5 ;
+# La fonction c() permet de décrire une suite d'éléments séparés par des virgules,
+# ces éléments sont des 'arguments' de la 'fonction' c().
+vectB &lt;- c(3,4,2,1,3)
+vectC &lt;- c("A","B","C","D","E") 
+# Le vecteur vectC est constitué d'éléments entre guillemets, ce sont des "chaînes de caractère".
+# Sans guillemets, R cherchera les objets nommés A, B, C, D et E qui n'existent pas.
+table &lt;- data.frame(vectA = vectA, vectB = vectB, vectC = vectC) 
+# Constitution du tableau ; /!\ les vecteurs doivent être de même taille
+# (avec un nombre identique d'éléments) pour être agrégés en tableau
+head(table) # Visualise les premières lignes de la table dans la console
+```
+
+---
+
++ **2. Soit on crée un tableau directement :**
+
+En condensant les étapes ci-dessus :
+
+
+```r
+DepRegHDF &lt;- data.frame(Departement=c("59","62","02","60","80"),
+                      LibDep=c("Nord", "Pas-de-Calais", "Aisne", "Oise", "Somme"),
+                      LibExReg=c("Nord Pas-de-Calais","Nord Pas-de-Calais","Picardie","Picardie","Picardie"))
+DepRegHDF
+```
+
+```
+##   Departement        LibDep           LibExReg
+## 1          59          Nord Nord Pas-de-Calais
+## 2          62 Pas-de-Calais Nord Pas-de-Calais
+## 3          02         Aisne           Picardie
+## 4          60          Oise           Picardie
+## 5          80         Somme           Picardie
+```
+
+---
+## Importations de fichiers
+
+En général, on ne saisit pas directement les données dans R, elles sont recueillies dans un autre fichier qu'on importe dans R en créant un nouvel objet.
+
+Le fichier source peut être en format :
+
+  - Texte (.txt, .csv),
+  - Tableur : Excel (xls, xlsx), Calc (.ods),
+  - Tables issues de logiciels statistiques : SAS (.sas7bdat), SPSS (sav),
+  - Format R : (.RData)
+  - html, xml, json, etc.
+
+
+Plusieurs packages facilitent l'importation directe de tableaux de données enregistrés dans divers formats (ex : package xlsx).
+
+---
+
+### Fichiers textes (cvs, txt)
+
+Les fichiers sont enregistrés en CSV dans le sous-dossier "data/BAAC2018" :
+
+```r
+caract &lt;-read.csv("data/BAAC2018/caracteristiques-2018.csv",
+                  fileEncoding = "ISO-8859-1",
+                  stringsAsFactors = F)
+# argument nécessaire : "SousDossiers/NomFichier.csv"
+# arguments utiles dans ce cas :
+# - fileEncoding = format d'encodage des caractères
+# - stringsAsFactors = F ; ne pas transformer les chaînes de caractères en facteurs (modalités enregistrées en codes)
+# arguments par défaut :
+# header = TRUE/FALSE : La première ligne correspond-elle aux titres des variables ?
+# sep = "," : Choix du caractère séparant les cellules du tableau
+# dec ="," : Choix du caractère des décimales
+```
+
+`read.csv2` quand le séparateur est le ";"
+
+`read.table` pour les fichiers .txt et séparateur = "\t"
+
+---
+## Importer les autres fichiers .csv téléchargés
+---
+## Importer les autres fichiers .csv téléchargés
+
+
+```r
+lieux &lt;-read.csv("data/BAAC2018/lieux-2018.csv",
+                  fileEncoding = "ISO-8859-1",
+                  stringsAsFactors = F)
+vehicules &lt;-read.csv("data/BAAC2018/vehicules-2018.csv",
+                  fileEncoding = "ISO-8859-1",
+                  stringsAsFactors = F)
+usagers &lt;-read.csv("data/BAAC2018/usagers-2018.csv",
+                  fileEncoding = "ISO-8859-1",
+                  stringsAsFactors = F)
+```
+
+---
+
+## Exporter des données
+
+**Format R :**
+
+```r
+saveRDS(Table, "Table.rds")
+Table &lt;- readRDS("Table.rds")
+```
+
+**Ensemble de l'environnement :**
+
+```r
+save(table1, table2, matrice, file = "mydata.rdata")
+load("mydata.rdata") 
+# /!\ importe l'ensemble, même si les objets existent déjà
+```
+
+**Fichier texte :**
+
+```r
+write.csv2(Table, "Table.csv", fileEncoding = "UTF-8", na="", row.names = F)
+write.table(Table, "Table.txt", sep="\t", fileEncoding = "UTF-8")
+```
+
+
+---
+
+## Informations minimales sur un tableau
+
+Dimensions du tableau et noms des variables :
+
+```r
+dim(vehicules) # lignes    colonnes
+names(vehicules)
+```
+
+
+Types des variables :
+
+```r
+str(vehicules)
+```
+
+
+
+---
+
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;h1 align="right"&gt;&lt;font color="#5C5C5C"&gt;3. Mise en forme des données&lt;/font&gt;&lt;/h1&gt;
+
+---
+
+## Tidyverse
+
+Le package `tidyverse` regroupe d'autres packages complémentaires qui ont été pensés selon une syntaxe commune et dont les principaux sont :
+
+- *readr* : importation
+- *tibble* : format des tableaux de données
+- *forcats* : mise en forme des facteurs
+- *stringr* : modification de chaînes de caractères
+- *tidyr* et *dplyr* : mise en forme de tableaux
+- *ggplot2* : graphiques
+
+L'ambition de `tidyverse` est de "ranger" les données, soit les mettre en forme et les structurer de façon à faciliter leur exploitation.
+
+Dans la suite de la présentation, nous verrons des fonctions de la syntaxe de base de R et de la syntaxe *Tidyverse*.
+
+---
+
+## Recodages de variables
+
+Les tableaux de données ne se présentent pas toujours sous une forme directement exploitable et doivent être nettoyés et retravaillés au fur et à mesure des traitements. 
+
+La première opération consiste à recoder les variables dont les modalités apparaissent parfois en codes, pour un gain de place, comme c'est le cas ici. Des données issues d'extractions automatiques (scraping) seront plus complexes à nettoyer et il faudra faire appel à des fonctions et opérations plus complexes (comme par exemple l'utilisation des expressions régulières, permettant de repérer et d'agir sur des formats récurrents de chaînes de caractères ou caractères spéciaux) ; Nous ne verrons pas ces formes plus complexes de recodage et de nettoyage.
+
+L'opération de base de remise en forme de base consiste à recoder les modalités.
+
+**Les opérateurs utiles :**
+
+- == : Egalité (A == B signifie "A est égal à B")
+- != : Exclusion ( A != B signifie "A est différent de B")
+- &lt; , &gt; , &lt;= , &gt;= : inférieur, supérieur, inférieur ou égal, supérieur à égal
+- %in% : appartient à
+
+**Enchaînement de plusieurs conditions :**
+
+- | : Ou bien
+- &amp; : Et
+
+---
+## Recodage simple d'une variable qualitative
+
+
+```r
+names(usagers)
+```
+
+```
+##  [1] "Num_Acc" "place"   "catu"    "grav"    "sexe"    "trajet"  "secu"   
+##  [8] "locp"    "actp"    "etatp"   "an_nais" "num_veh"
+```
+
+```r
+head(usagers$sexe)
+```
+
+```
+## [1] 1 1 1 1 1 1
+```
+
+```r
+class(usagers$sexe)
+```
+
+```
+## [1] "integer"
+```
+
+La colonne a été reconnue comme une colonne de "nombres entiers" (integer) alors qu'il s'agit d'une variable nominale (le sexe). 
+
+---
+On modifie le type de la variable :
+
+- Modifier en réel entier (integer) : as.integer()
+
+- Modifier en réel à décimales (numeric) : as.numeric()
+
+- Modifier en variable binaire (logical) : as.logical()
+
+- Modifier en date : as.Date()
+
+
+```r
+usagers$sexe &lt;- as.character(usagers$sexe)
+class(usagers$sexe)
+```
+
+```
+## [1] "character"
+```
+
+```r
+usagers$sexe [ usagers$sexe == "1"] &lt;- "Homme"
+usagers$sexe [ usagers$sexe == "2"] &lt;- "Femme"
+head(usagers$sexe)
+```
+
+```
+## [1] "Homme" "Homme" "Homme" "Homme" "Homme" "Homme"
+```
+
+---
+
+Avec la syntaxe **tidyverse**, le recodage peut se faire terme à terme avec `fct_recode` our en regroupant plusieurs modalités avec `fct_collapse`. Attention, elles portent sur des variables de type `facteur` :
+
+
+
+```r
+# grav
+usagers$grav &lt;- factor(usagers$grav)
+usagers$grav &lt;- fct_recode(usagers$grav,
+                                 "Indemne"="1",
+                                 "Tué" ="2",
+                                 "Blessé hospitalité"="3",
+                                 "Blessé léger"="4")
+```
+
+
+---
+## Recoder les variables trajet et catu
+---
+## Recoder les variables trajet et catu
+
+
+```r
+# trajet
+usagers$trajet &lt;- factor(usagers$trajet)
+usagers$trajet &lt;- fct_recode(usagers$trajet,
+                                 "Domicile/travail"="1",
+                                 "Domicile/école" ="2",
+                                 "Courses/achats"="3",
+                                 "Trajet professionnel"="4",
+                                 "Promenade/loisirs"="5",
+                                 "Autre"="9")
+levels(usagers$trajet)
+```
+
+```
+## [1] "0"                    "Domicile/travail"     "Domicile/école"      
+## [4] "Courses/achats"       "Trajet professionnel" "Promenade/loisirs"   
+## [7] "Autre"
+```
+
+```r
+# catu
+usagers$catu &lt;- factor(usagers$catu)
+usagers$catu  &lt;- fct_recode(usagers$catu ,
+"Piéton" = "3",
+"Conducteur"="1",
+"Passager"="2")
+```
+
+
+---
+## Opérations sur les variables
+
+De nouvelles variables issues d'autres variables peuvent être créées par calculs. R - comme tout autre langage - éxecute l'ensemble des opérateurs mathématiques :
+
+**+** : Addition
+
+**-** : Soustraction
+
+** \* ** : Multiplication
+
+**/** : Division
+
+**%/%** : Division euclidienne
+
+**%%** : modulo
+
+**^** : puissance
+
+---
+
+
+
+```r
+class(usagers$an_nais)
+```
+
+```
+## [1] "integer"
+```
+
+```r
+usagers$age &lt;- 2018 - usagers$an_nais
+head(usagers$age)
+```
+
+```
+## [1] 90 58 71 59 31 41
+```
+
+
+
+---
+
+## Création de catégories
+
+
+```r
+# En 5 classes d'amplitude égale
+usagers$age.classe &lt;- cut(usagers$age, 5)
+# Selon les bornes définies
+usagers$age.classe.majorite &lt;- cut(usagers$age, c(0,18,110), right=F)
+# Selone une séquence définie
+usagers$age.classe.decennies &lt;- cut(usagers$age, seq(0,110,10), right=F)
+# Selon des quantiles
+usagers$age.classe.quartiles &lt;- cut(usagers$age, quantile(usagers$age, seq(0,1,.25), na.rm=T), right=F)
+```
+
+
+---
+
+## Créer une variable à partir d'autres variables
+
+Fonction **ifelse(condition, si condition remplie, si condition non remplie)** :
+
+
+```r
+usagers$majorite &lt;- ifelse (usagers$age &lt; 18, "mineur","majeur")
+```
+
+---
+
+## Créer une variable à partir d'autres variables
+
+
+
+```r
+# unique(caract$dep)
+caract$dep &lt;- ifelse(nchar(caract$dep)==2,
+                               paste0("0", caract$dep),
+                               caract$dep)
+# nchar() : nombre de caractères
+# paste0() : concaténation sans séparateur
+caract$HdF &lt;- ifelse (caract$dep %in% c("590","620","800","600","020"), 
+                      "Hauts de France", 
+                      "Hors Hauts de France")
+```
+
+---
+
+## Recodages de la table Caractéristiques
+
+Variables `lum`, `agg`, `atm`
+
+---
+
+## Recodages de la table Caractéristiques
+
+
+```r
+# Luminosité
+caract$lum &lt;- fct_collapse(factor(caract$lum),
+                           "Jour"="1",
+                           "Aube/crépuscule"="2",
+                           "Nuit (sans écl.)"=c("3","4"),
+                           "Nuit (avec écl.)"="5")
+# Agglomération
+caract$agg &lt;- fct_recode(factor(caract$agg),
+                           "Hors agglo."="1",
+                           "En agglo."="2")
+
+# Conditions atmosphériques
+caract$atm &lt;- fct_recode(factor(caract$atm),
+                         "Normales"="1",
+                         "Pluie légère"="2",
+                         "Pluie forte" ="3",
+                         "Neige, grêle"="4",
+                         "Brouillard"="5",
+                         "Vent fort, tempête"="6",
+                         "Temps éblouissant"="7",
+                         "Temps couvert"="8",
+                         "Autre" = "9")
+```
+
+
+---
+
+## Recodages de la table lieux
+
+Variables `catr`, `surf`, `situ`, `situ`, `vosp`
+
+---
+
+## Recodages de la table lieux
+
+
+
+```r
+lieux$catr[lieux$catr=="1"]&lt;-"Autoroute"
+lieux$catr[lieux$catr=="2"]&lt;-"Nationale"
+lieux$catr[lieux$catr=="3"]&lt;-"Départementale"
+lieux$catr[lieux$catr=="4"]&lt;-"Communale"
+lieux$catr[lieux$catr=="5"]&lt;-"Hors réseau public"
+lieux$catr[lieux$catr=="6"]&lt;-"Parking"
+lieux$catr[lieux$catr=="9"]&lt;-"Autre"
+
+
+lieux$surf[lieux$surf=="1"]&lt;-"Normale"
+lieux$surf[lieux$surf=="2"]&lt;-"Mouillée"
+lieux$surf[lieux$surf=="3"]&lt;-"Flaques"
+lieux$surf[lieux$surf=="4"]&lt;-"Innondée"
+lieux$surf[lieux$surf=="5"]&lt;-"Enneigée"
+lieux$surf[lieux$surf=="6"]&lt;-"Boue"
+lieux$surf[lieux$surf=="7"]&lt;-"Verglas"
+lieux$surf[lieux$surf=="8"]&lt;-"Gras, huile"
+lieux$surf[lieux$surf=="9"]&lt;-"Autre"
+lieux$surf[lieux$surf=="0"]&lt;-"NR"
+lieux$surf[is.na(lieux$surf)]&lt;-"NR"
+```
+
+
+---
+
+## Recodages de la table lieux
+
+
+
+
+```r
+lieux$situ [ lieux$situ == '1'] &lt;- "Chaussée"
+lieux$situ [ lieux$situ == '2'] &lt;- "Bande d'arrête d'urgence"
+lieux$situ [ lieux$situ == '3'] &lt;- "Accotement"
+lieux$situ [ lieux$situ == '4'] &lt;- "Trottoir"
+lieux$situ [ lieux$situ == '5'] &lt;- "Piste cyclable"
+
+
+lieux$circ &lt;- fct_recode(factor(lieux$circ),
+                              "Sens unique" = "1",
+                              "Bidirectionnel" = "2",
+                              "Chaussées séparées" = "3",
+                              "Vois d'affectation variable" = "4")
+
+lieux$vosp &lt;- fct_recode(factor(lieux$vosp),
+                            "Piste cyclable"="1",
+                            "Bande cyclable" = "2",
+                            "Voie réservée" = "3",
+                            "Pas d'amménagement" = "0")
+```
+
+
+---
+
+## Recodages de la table Véhicules
+
+Variable `catv`
+
+
+---
+
+## Recodages de la table Véhicules
+
+
+```r
+vehicules$catv &lt;- as.integer(vehicules$catv)
+
+
+vehicules$Vehicule &lt;- case_when(vehicules$catv==1 ~ "2 roues non motorisé", 
+                                (vehicules$catv&gt;1 &amp; vehicules$catv&lt;7) ~ "2 roues motorisé",
+                                 (vehicules$catv&gt;=7 &amp;
+                                vehicules$catv&lt;=9)~ "Voiture",
+                                (vehicules$catv&gt;=10 &amp;
+                                vehicules$catv&lt;=12)~ "Utilitaire",
+                                (vehicules$catv&gt;=13 &amp;
+                                vehicules$catv&lt;=15)~ "Poids lourd",
+                                (vehicules$catv&gt;=16 &amp;
+                                vehicules$catv&lt;=17)~ "Tracteur",
+                                (vehicules$catv==19 |
+                                vehicules$catv==40)~ "Tramway",
+                                (vehicules$catv==21)~ "Tracteur",
+                                (vehicules$catv&gt;=30 &amp;
+                                vehicules$catv&lt;=34)~ "2 roues motorisé",
+                                (vehicules$catv&gt;=35 &amp;
+                                vehicules$catv&lt;=36)~ "Quad",
+                                (vehicules$catv&gt;=37 &amp;
+                                vehicules$catv&lt;=38) ~ "Bus",
+                                vehicules$catv==39 ~ "Train",
+                                (vehicules$catv==20 |
+                                vehicules$catv==99)~ "Autre",
+                                T ~ "")
+```
+---
+
+```r
+vehicules$Vehicule &lt;- fct_collapse(vehicules$Vehicule,
+                                  "Voitures, utilitaires" = c("Voiture","Utilitaire"),
+                                  "Poids lourds / tram / train" = c("Bus","Poids lourd","Tracteur","Bus", "Tramway","Train"),
+                                  "2 roues motorisés / quad" = c("2 roues motorisé", "Quad") )
+```
+
+---   
+## Recodage de l'heure de l'accident
+
+---
+   
+## Recodage de l'heure de l'accident
+
+
+```r
+head(caract$hrmn)
+```
+
+```
+## [1] 1505 1015 1135 1735 1605  630
+```
+
+```r
+## Etape 1 : Ajouter les zéros manquants en début d'observation
+caract$hrmn &lt;- as.character(caract$hrmn)
+caract$hrmn&lt;- case_when (nchar(caract$hrmn)==3 ~ 
+                        paste0("0",caract$hrmn),
+                        nchar(caract$hrmn)==2 ~ 
+                        paste0("00",caract$hrmn),
+                        nchar(caract$hrmn)==1 ~ 
+                        paste0("000",caract$hrmn),
+                       nchar(caract$hrmn)==4 ~ caract$hrmn,
+                               T ~ "")
+```
+
+---
+## Recodage de l'heure de l'accident
+
+```r
+# Etape 2 : conserver les heures uniquement (2 premiers caractères) :
+# fonction substr(variable, 1er caract, dernier caract)
+substr("abcd",1,2)
+```
+
+```
+## [1] "ab"
+```
+
+```r
+caract$hrmn &lt;- substr(caract$hrmn,
+                        1,2)
+caract$hrmn &lt;- factor(caract$hrmn)
+caract$hrmnCl &lt;- fct_collapse(caract$hrmn,
+                                 "00h-06h" = c("00","01","02","03","04","05"),
+                                 "06h-10h" = c("06","07","08","09"),
+                                 "10h-14h" = c("10","11","12","13"),
+                                 "14h-17h" = c("14","15","16"),
+                                 "17h-20h" = c("17","18","19"),
+                                 "20h-00h" = c("20","21","22","23"))
+```
+
+---
+
+## Sélections, filtres et tris
+
+En **R-base**, les tableaux de données sont des dataframes dont la structure est : 
+
+**Tableau [ lignes , colonnes ]**. 
+
+### Concrètement
+
+Sélectionner et filtrer **des lignes** :
+
+```r
+usagers[1:3 , ] # 3 premières lignes
+usagers[usagers$age&lt;18 , ] # usagers de moins de 18 ans
+usagersF &lt;- usagers[usagers$sexe=="Femme" , ]
+```
+
+Sélectionner **des colonnes** :
+
+```r
+Moment &lt;- caract [ , c("Num_Acc", "mois", "jour", "hrmn")]
+```
+
+---
+
+## 
+
+En revanche, en `Tidyverse`, les données sont représentées dans des **tibbles**. En réalité, toutes les fonctions de Tidyverse agissant sur des data.frames rendront des tibbles. Ils ne sont pas très différents des data.frames :
+
+- Pas de rownames
+- Espaces, caractères spéciaux et nombres en noms de colonne possibles
+- Affichage : premières lignes, dimensions, types de colonnes
+
+Actions sur leur structure : **fonction ( table, condition)**
+
+---
+
+## Sélection de lignes : `slice`...
+
+
+```r
+# 4 premières lignes :
+slice(usagers,1:4) 
+```
+
+```
+##     Num_Acc place       catu               grav  sexe            trajet secu
+## 1 2.018e+11     1 Conducteur Blessé hospitalité Homme                 0   11
+## 2 2.018e+11     1 Conducteur            Indemne Homme Promenade/loisirs   11
+## 3 2.018e+11     1 Conducteur            Indemne Homme                 0   11
+## 4 2.018e+11    NA     Piéton       Blessé léger Homme                 0    2
+##   locp actp etatp an_nais num_veh age  age.classe age.classe.majorite
+## 1    0    0     0    1928     B01  90  (85.6,107]            [18,110)
+## 2    0    0     0    1960     A01  58 (42.8,64.2]            [18,110)
+## 3    0    0     0    1947     A01  71 (64.2,85.6]            [18,110)
+## 4    2    3     1    1959     A01  59 (42.8,64.2]            [18,110)
+##   age.classe.decennies age.classe.quartiles majorite
+## 1             [90,100)             [52,107)   majeur
+## 2              [50,60)             [52,107)   majeur
+## 3              [70,80)             [52,107)   majeur
+## 4              [50,60)             [52,107)   majeur
+```
+
+---
+##  et de colonnes `select` :
+
+
+```r
+ # sélection de "id" et des colonnes contenant "groupe" :
+Date &lt;- caract %&gt;% 
+  select(Num_Acc, mois, jour, hrmn)
+```
+
+
+## Filtres : `fliter` :
+
+
+```r
+usagersPietons &lt;- filter(usagers, catu=="Piétons")
+```
+
+## Trier des données
+
+`arrange` :
+
+```r
+usagers &lt;- arrange(usagers, desc(age))
+slice(usagers,1:2)
+```
+
+```
+##        Num_Acc place     catu         grav  sexe            trajet secu locp
+## 1 201800055647     2 Passager      Indemne Homme Promenade/loisirs   11   NA
+## 2 201800007179     2 Passager Blessé léger Femme Promenade/loisirs   11    0
+##   actp etatp an_nais num_veh age age.classe age.classe.majorite
+## 1   NA    NA    1911     A01 107 (85.6,107]            [18,110)
+## 2    0     0    1916     A01 102 (85.6,107]            [18,110)
+##   age.classe.decennies age.classe.quartiles majorite
+## 1            [100,110)                 &lt;NA&gt;   majeur
+## 2            [100,110)             [52,107)   majeur
+```
+
+---
+
+## L'opérateur `%&gt;%` (pipe)
+
+L'opérateur `%&gt;%` (*pipe*, ctrl+shift+m) permet d'enchaîner des fonctions :
+
+Sans le pipe, on peut encaster les fonctions ou les écrire à la suite.
+
+```r
+slice(
+  select(
+    arrange(
+      filter(usagers, sexe=="Homme"),
+      desc(age)
+      ),
+    age, grav, catu),
+  1:2)
+```
+
+```
+##   age         grav       catu
+## 1 107      Indemne   Passager
+## 2 101 Blessé léger Conducteur
+```
+... pas très lisible (il faut lire de l’intérieur vers l’extérieur), difficile de voir les arguments associés à chaque fonction.
+
+---
+## 
+
+Le pipe permet d’enchainer les fonctions en prenant comme argument principal le résultat de la fonction précédente : `f(a)` s’écrit `a %&gt;% f()`.
+
+table %&gt;% 
+fonction1() %&gt;% 
+fonction2()
+
+au lieu de fonction2(fonction1(table))
+
+Ce qui, pour l'exemple, donne :
+
+
+```r
+usagers %&gt;% 
+  filter(sexe=="Homme") %&gt;% 
+  arrange(desc(age)) %&gt;% 
+  select(age, grav, catu) %&gt;% 
+  slice(1:2)
+```
+
+```
+##   age         grav       catu
+## 1 107      Indemne   Passager
+## 2 101 Blessé léger Conducteur
+```
+
+
+
+
+---
+## Jointures de tables
+
+Les données sur les accidents sont organisées en plusieurs tables relatives à plusieurs unités statistiques (l'événement "accident", les véhicules impliqués et les usagers impliqués). Il est toutefois possible de les regrouper si on dispose d'une clé d'appariemment (une variable commune à deux tables permettant d'associer les accidents avec les personnes et les véhicules concernés).
+
+Exemple 1 : Jointure des tables "Caractéristiques" et "lieux" :
+
+
+```r
+Accident &lt;- merge (x = caract, y = lieux, by = "Num_Acc")
+```
+
+---
+Exemple 2 : Ajout des caractéristiques de l'accident dans la table usagers :
+
+
+```r
+usagers &lt;- merge (x = usagers, y = Accident, by = "Num_Acc", all.x = T)
+```
+
+Exemple 3 : Ajout des données sur les véhicules dans la table usagers :
+
+
+```r
+usagers &lt;- merge (usagers, vehicules, by = c("Num_Acc","num_veh"), all.x = T)
+```
+
+
+*Options :*
+
+- Pour garder toutes les observations de Deputes : all.x = T
+- Pour garder toutes les observations de ActiviteAN : all.y = T
+- Pour garder toutes les observations de Deputeset ActiviteAN : all = T
+- Possibilité d'avoir une clé qui porte un nom différent dans les tables : by.x = "id_table_x", by.y = "id_table_y"
+- Possibilité d'avoir 2 colonnes clés : by = c("id1","id2")
+
+
+
+---
+
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;h1 align="right"&gt;&lt;font color="#5C5C5C"&gt;4. Traitements et graphiques avec `ggplot2`&lt;/font&gt;&lt;/h1&gt;
+
+
+---
+
+## Représenter une variable
+
+### Variable qualitative
+
+#### Effectifs
+
+
+```r
+table(usagers$sexe) # Nombre d'observations pour chaque modalité
+```
+
+```
+## 
+## Femme Homme 
+## 41951 88218
+```
+
+```r
+table(usagers$sexe, useNA="ifany") # Ajout des NA : Non-attribués
+```
+
+```
+## 
+## Femme Homme 
+## 41951 88218
+```
+
+---
+
+## Représenter une variable
+
+### Variable qualitative
+
+#### Effectifs
+
+
+```r
+addmargins(table(usagers$sexe, useNA="ifany")) # Ajout de l'ensemble
+```
+
+```
+## 
+##  Femme  Homme    Sum 
+##  41951  88218 130169
+```
+
+---
+
+## Pourcentages
+
+
+```r
+prop.table(table(usagers$sexe))*100 # En pourcentages
+```
+
+```
+## 
+##   Femme   Homme 
+## 32.2281 67.7719
+```
+
+```r
+round(prop.table(table(usagers$sexe))*100, 1) # En pourcentages arrondis
+```
+
+```
+## 
+## Femme Homme 
+##  32.2  67.8
+```
+
+---
+
+## Avec questionr
+
+
+```r
+library(questionr)
+freq(usagers$sexe, sort="dec",total=T) # sort="dec" pour trier par ordre décroissant,
+```
+
+```
+##            n     %  val%
+## Homme  88218  67.8  67.8
+## Femme  41951  32.2  32.2
+## Total 130169 100.0 100.0
+```
+
+```r
+# cum = T pour les %ages cumulés, total= T pour avoir le total,
+# valid = F pour enlever la colonne val%
+```
+
+---
+
+## Une variable numérique (quantitative)
+
+#### Indices de centralité et de répartition
+
+
+```r
+median(usagers$age, na.rm = T)
+```
+
+```
+## [1] 36
+```
+
+```r
+mean(usagers$age, na.rm=T)
+```
+
+```
+## [1] 38.65283
+```
+
+```r
+summary(usagers$age)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    0.00   24.00   36.00   38.65   52.00  107.00      30
+```
+
+```r
+quantile(usagers$age, seq(0,1,.25), na.rm=T)
+```
+
+```
+##   0%  25%  50%  75% 100% 
+##    0   24   36   52  107
+```
+
+---
+
+## Représenter deux variables
+
+### Deux variables qualitatives
+
+
+
+```r
+addmargins(table(usagers$sexe, usagers$catu))
+```
+
+```
+##        
+##         Conducteur Passager Piéton    Sum
+##   Femme      24465    11901   5585  41951
+##   Homme      71560    11283   5375  88218
+##   Sum        96025    23184  10960 130169
+```
+
+---
+
+## 
+
+
+```r
+prop.table(table(usagers$sexe, usagers$catu),1) # 2 en colonnes
+```
+
+```
+##        
+##         Conducteur   Passager     Piéton
+##   Femme 0.58318038 0.28368811 0.13313151
+##   Homme 0.81117232 0.12789907 0.06092861
+```
+
+```r
+round(prop.table(table(usagers$sexe, usagers$catu),1)*100,1)
+```
+
+```
+##        
+##         Conducteur Passager Piéton
+##   Femme       58.3     28.4   13.3
+##   Homme       81.1     12.8    6.1
+```
+
+---
+
+## 
+
+
+```r
+rprop(table(usagers$sexe, usagers$catu)) # cprop en colonnes
+```
+
+```
+##           
+##            Conducteur Passager Piéton Total
+##   Femme     58.3       28.4     13.3  100.0
+##   Homme     81.1       12.8      6.1  100.0
+##   Ensemble  73.8       17.8      8.4  100.0
+```
+
+---
+
+## Gravité des accidents pour les piétons selon le type de véhicules avec lesquels ils ont eu un accident
+
+
+```r
+Pietons &lt;- usagers %&gt;% filter(catu=="Piéton")
+rprop(table(Pietons$Vehicule, Pietons$grav))
+```
+
+```
+##                              
+##                               Indemne Tué   Blessé hospitalité Blessé léger
+##   2 roues motorisés / quad      3.8     1.7  24.2               70.3       
+##   2 roues non motorisé          9.0     1.1  16.0               73.9       
+##   Autre                         3.7     8.1  29.8               58.4       
+##   Poids lourds / tram / train   1.4    14.8  36.4               47.4       
+##   Voitures, utilitaires         1.8     4.6  32.7               61.0       
+##   Ensemble                      2.2     4.6  31.3               61.8       
+##                              
+##                               Total
+##   2 roues motorisés / quad    100.0
+##   2 roues non motorisé        100.0
+##   Autre                       100.0
+##   Poids lourds / tram / train 100.0
+##   Voitures, utilitaires       100.0
+##   Ensemble                    100.0
+```
+
+---
+
+## Gravité des accidents pour les piétons selon l'heure de la journée :
+
+```r
+rprop(table(Pietons$hrmnCl, Pietons$grav))
+```
+
+```
+##           
+##            Indemne Tué   Blessé hospitalité Blessé léger Total
+##   00h-06h    3.9    18.9  35.0               42.2        100.0
+##   06h-10h    1.6     4.7  30.0               63.7        100.0
+##   10h-14h    1.9     3.5  31.0               63.6        100.0
+##   14h-17h    2.7     2.9  31.1               63.2        100.0
+##   17h-20h    2.6     3.7  32.0               61.7        100.0
+##   20h-00h    1.7     7.4  31.6               59.3        100.0
+##   Ensemble   2.2     4.6  31.3               61.8        100.0
+```
+---
+
+### Une variable numérique et une qualitative
+
+Fonction `tapply` : Appliquer les effets d'une fonction à un vecteur selon les modalités d'un autre :
+
+
+```r
+tapply( usagers$age,usagers$catu, median, na.rm=T)
+```
+
+```
+## Conducteur   Passager     Piéton 
+##         38         24         40
+```
+
+```r
+tapply(  usagers$age,usagers$catu, summary)
+```
+
+```
+## $Conducteur
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    3.00   26.00   38.00   40.31   52.00  101.00      27 
+## 
+## $Passager
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    0.00   17.00   24.00   30.28   42.00  107.00       3 
+## 
+## $Piéton
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00   18.00   40.00   41.86   64.00  102.00
+```
+
+
+---
+## Graphiques
+
+
+### Description générale
+
+`GGplot2` est un package dédié aux graphiques. Sa syntaxe est celle du `Tidyverse`. L'intérêt de `Ggplot2` est de produire et reproduire rapidement et efficacement des graphiques complexes. De plus, il est possible d'enchaîner la mise en forme des tableaux avec la réalisation des graphiques.
+
+**La syntaxe de base de ggplot est :**
+
+`ggplot` (table_de_données) + `aes` (x = Variable_abscisses, y = Variable_ordonnées) + `geom_X` (type de graphique et options)
+
+où `ggplot` définit la source des données, `aes` les données à représenter, `geom_X` le type de représentation.
+
+---
+
+Exemple :
+
+
+```r
+ggplot(caract)+
+  aes(x=hrmnCl)+
+  geom_bar(stat="count")
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-48-1.png)&lt;!-- --&gt;
+
+
+---
+## `aes`
+
+Les options de `aes` (pour *aesthetics*) permettent d'associer une donnée à un type de représentation :
+
+x = axe des abscisses
+
+y = axe des ordonnées
+
+size = taille des points
+
+col = couleur des points / contours
+
+alpha = transparence
+
+fill = couleur des applats
+
+---
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,  fill=sexe)+
+  geom_bar(stat="count", position = "dodge") # fill, stack
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-49-1.png)&lt;!-- --&gt;
+
+
+
+
+---
+## `geom_X`
+
+Les `geom_X` correspondent aux types de représentation graphique attendus ; Les principaux sont :
+
+- geom_bar : Diagramme en barres
+- geom_histogram : Histogramme
+- geom_point : Nuage de points
+- geom_boxplot : Boxplot
+- geom_line : Lignes
+- geom_text : Ajout de texte
+- geom_label : Idem, labels
+- Etc.
+
+Suivant les `geom_X`, différentes options de représentations peuvent être attendues.
+
+---
+
+```r
+ggplot(usagers)+
+  aes(x=age, fill=grav)+
+  geom_histogram(bins=30)
+```
+
+```
+## Warning: Removed 30 rows containing non-finite values (stat_bin).
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-50-1.png)&lt;!-- --&gt;
+---
+
+```r
+ggplot(usagers)+
+  aes(x=age, fill=grav)+
+  geom_histogram(bins=30, col="black")
+```
+
+```
+## Warning: Removed 30 rows containing non-finite values (stat_bin).
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-51-1.png)&lt;!-- --&gt;
+---
+
+
+```r
+ggplot(usagers) + aes(x=hrmnCl, y=age, fill = hrmnCl)+ geom_boxplot(show.legend=F)
+```
+
+```
+## Warning: Removed 30 rows containing non-finite values (stat_boxplot).
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-52-1.png)&lt;!-- --&gt;
+---
+## Mise en forme
+
+### Les titres : `labs`
+
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,fill=grav)+
+  geom_bar(stat="count", position = "dodge")+
+ labs(x="Heure de l'accident",
+      y="Nombre d'usagers",
+      fill = "Gravité",
+      title="Gravité de l'accident pour les usagers selon l'heure")
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-53-1.png)&lt;!-- --&gt;
+
+---
+## Les thèmes
+
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,fill=grav)+
+  geom_bar(stat="count", position = "dodge")+
+ labs(x="Heure de l'accident",
+      y="Nombre d'usagers",
+      fill = "Gravité",
+      title="Gravité de l'accident pour les usagers selon l'heure") +
+  theme(title = element_text(size=20))
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-54-1.png)&lt;!-- --&gt;
+
+---
+## Les thèmes
+
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,fill=grav)+
+  geom_bar(stat="count", position = "dodge")+
+ labs(x="Heure de l'accident",
+      y="Nombre d'usagers",
+      fill = "Gravité",
+      title="Gravité de l'accident pour les usagers selon l'heure") +
+  theme_light()
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-55-1.png)&lt;!-- --&gt;
+---
+
+## Les couleurs
+
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,fill=grav)+
+  geom_bar(stat="count", position = "dodge")+
+ viridis::scale_fill_viridis(discrete=T, option="E")+
+ labs(x="Heure de l'accident",
+      y="Nombre d'usagers",
+      fill = "Gravité",
+      title="Gravité de l'accident pour les usagers selon l'heure") +
+  theme_light()
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-56-1.png)&lt;!-- --&gt;
+---
+## Plusieurs graphiques en fonction d'une variable
+
+
+
+```r
+ggplot(usagers)+
+  aes(x=hrmnCl,fill=grav)+
+  geom_bar(stat="count", position = "dodge")+
+ labs(x="Heure de l'accident",
+      y="Nombre d'usagers",
+      fill = "Gravité",
+      title="Gravité de l'accident pour les usagers selon l'heure") +
+  theme_light()+
+  facet_grid(. ~ sexe)
+```
+
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-57-1.png)&lt;!-- --&gt;
+
+---
+## Cartographie
+
+```r
+library(sf)
+dep &lt;- st_read("data/SHP/departements-20140306-50m.shp")
+```
+
+```
+## Reading layer `departements-20140306-50m' from data source `/home/cecile/Documents/Ateliers/DataSHS_2019/data/SHP/departements-20140306-50m.shp' using driver `ESRI Shapefile'
+## Simple feature collection with 101 features and 4 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XY
+## bbox:           xmin: -61.80976 ymin: -21.38973 xmax: 55.83665 ymax: 51.08984
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs
+```
+
+```r
+dep &lt;- dep %&gt;% filter(nchar(as.character(code_insee))==2)
+head(dep$code_insee)
+```
+
+```
+## [1] 01 02 03 04 05 06
+## 101 Levels: 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 21 ... 976
+```
+
+```r
+head(caract$dep)
+```
+
+```
+## [1] "590" "590" "590" "590" "590" "590"
+```
+
+```r
+usagers$grav.rec &lt;- ifelse(usagers$grav=="Tué" | usagers$grav=="Blessé hospitalisé",
+                           "Tué ou hospitalisé","Autre")
+```
+
+---
+
+```r
+usagersmap &lt;- usagers %&gt;% 
+  mutate(dep = substr(dep,1,2)) %&gt;% 
+  group_by(dep, grav.rec) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  spread( grav.rec,n) %&gt;% 
+  mutate(grav.p = round(`Tué ou hospitalisé`/(`Tué ou hospitalisé`+Autre)*100,1))
+dep &lt;- merge(dep, usagersmap, by.x = "code_insee",by.y="dep", all.x=T)
+ggplot(dep)+
+  aes(fill=grav.p)+
+  geom_sf()+
+  viridis::scale_fill_viridis(option="E")+
+  theme_light()+ 
+  coord_sf(datum=NA)
+```
+---
+![](DataSHS_PUDL_19_files/figure-html/unnamed-chunk-60-1.png)&lt;!-- --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
